@@ -1,0 +1,17 @@
+[
+  { "id": 1, "word": "Alleviate", "level": "B2", "def": "To make suffering or a problem less severe.", "ex": "The new medicine will help alleviate your back pain." },
+  { "id": 2, "word": "Ambiguous", "level": "C1", "def": "Open to more than one interpretation; not having one obvious meaning.", "ex": "His reply to my question was somewhat ambiguous." },
+  { "id": 3, "word": "Essential", "level": "B1", "def": "Absolutely necessary; extremely important.", "ex": "It is essential to keep all your records in a safe place." },
+  { "id": 4, "word": "Conspicuous", "level": "C1", "def": "Clearly visible or attracting attention.", "ex": "The bird has a conspicuous red head." },
+  { "id": 5, "word": "Reluctant", "level": "B2", "def": "Unwilling and hesitant; disinclined.", "ex": "She was reluctant to admit she was wrong." },
+  { "id": 6, "word": "Adequate", "level": "B1", "def": "Satisfactory or acceptable in quality or quantity.", "ex": "This office is perfectly adequate for my needs." },
+  { "id": 7, "word": "Elaborate", "level": "C1", "def": "Involving many carefully arranged parts or details.", "ex": "They made elaborate preparations for the wedding." },
+  { "id": 8, "word": "Hectic", "level": "B2", "def": "Full of incessant or frantic activity.", "ex": "Life in the city is extremely hectic." },
+  { "id": 9, "word": "Evaluate", "level": "B1", "def": "To form an idea of the amount, number, or value of something.", "ex": "We need to evaluate the success of the campaign." },
+  { "id": 10, "word": "Ubiquitous", "level": "C1", "def": "Present, appearing, or found everywhere.", "ex": "Sugar is ubiquitous in processed foods." },
+  { "id": 11, "word": "Plausible", "level": "B2", "def": "Seeming reasonable or probable.", "ex": "That is a plausible explanation for the incident." },
+  { "id": 12, "word": "Simultaneously", "level": "B2", "def": "At the same time.", "ex": "The movie was released simultaneously in theaters and online." },
+  { "id": 13, "word": "Feasible", "level": "C1", "def": "Possible to do easily or conveniently.", "ex": "It is not economically feasible to run the project." },
+  { "id": 14, "word": "Acknowledge", "level": "B1", "def": "Accept or admit the existence or truth of.", "ex": "They acknowledged that the decision was a mistake." },
+  { "id": 15, "word": "Meticulous", "level": "C1", "def": "Showing great attention to detail; very careful and precise.", "ex": "He was meticulous about keeping his desk clean." }
+]
