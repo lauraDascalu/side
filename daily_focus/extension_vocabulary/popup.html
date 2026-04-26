@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>Daily EngBridge</h1>
+  <p>Your tool to bridge up to your desired level of English!</p>
+  
+  <div class="setting-group">
+    <label>Choose your level:</label>
+    <select id="level-select">
+      <option value="B1">Intermediate (B1)</option>
+      <option value="B2">Upper Intermediate (B2)</option>
+      <option value="C1">Advanced (C1)</option>
+    </select>
+  </div>
+
+  <div class="setting-group">
+    <label>Notification time:</label>
+    <div class="time-inputs">
+      <input type="number" id="hour-select" min="0" max="23" value="09">
+      <span>:</span>
+      <input type="number" id="minute-select" min="0" max="59" value="00">
+    </div>
+  </div>
+
+  <button id="save-settings">Save settings</button>
+  <p id="status-msg" style="color: green; font-size: 11px; margin-top: 10px;"></p>
+
+  <script src="popup.js"></script>
+</body>
+</html>

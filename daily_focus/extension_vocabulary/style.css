@@ -1,0 +1,121 @@
+
+body {
+    width: 320px;
+    padding: 20px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #ffffff;
+    color: #333;
+    margin: 0;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+h1 {
+    font-size: 1.6em;
+    font-weight: 600;
+    color: #007bff;
+    margin-bottom: 5px;
+    margin-top: 0;
+    display: flex;
+    align-items: center;
+    transition: color 0.3s ease;
+}
+
+h1:hover {
+    color: #0056b3;
+}
+
+p {
+    font-size: 0.85em;
+    color: #777;
+    margin-bottom: 20px;
+    line-height: 1.4;
+}
+
+.setting-group {
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+}
+
+label {
+    display: block;
+    font-weight: 600;
+    font-size: 0.9em;
+    color: #333;
+    margin-bottom: 8px;
+}
+
+select, input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    background-color: #fcfcfc;
+    font-family: inherit;
+    font-size: 0.95em;
+    color: #333;
+    transition: all 0.3s ease;
+    outline: none;
+}
+
+select:focus, input:focus {
+    border-color: #007bff;
+    background-color: #fff;
+    box-shadow: 0 0 8px rgba(0, 123, 255, 0.1);
+}
+
+.time-inputs {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    background: #f8fafc;
+    padding: 10px;
+    border-radius: 12px;
+}
+
+.time-inputs input {
+    width: 60px;
+    text-align: center;
+    font-weight: bold;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    padding: 8px;
+}
+
+.time-inputs span {
+    font-weight: bold;
+    color: #007bff;
+}
+
+button {
+    width: 100%;
+    padding: 12px;
+    margin-top: 10px;
+    border-radius: 25px; 
+    border: 1px solid #007bff;
+    background-color: #007bff;
+    color: white;
+    font-weight: 600;
+    font-size: 1em;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 6px rgba(0, 123, 255, 0.15);
+}
+
+button:hover {
+    background-color: #0056b3;
+    border-color: #0056b3;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 123, 255, 0.25);
+}
+
+button:active {
+    transform: translateY(0);
+}
+
+#status-msg {
+    text-align: center;
+    font-weight: 500;
+    min-height: 15px;
+}
+

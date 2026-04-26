@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <title>DailyFocus</title>
+    
+    <style>
+        :root {
+            --title: #6572c3;
+            --bg-gradient: radial-gradient(circle at top right, #f4e597, #c8efe1, #909efb);
+            --accent-color: #2d2f93;
+            --glass-bg: rgba(233, 248, 249, 0.7);
+            --card-radius: 2rem;
+        }
+
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            background: var(--bg-gradient);
+            min-height: screen;
+        }
+
+        .glass { 
+            background: var(--glass-bg); 
+            backdrop-filter: blur(12px); 
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+
+        .text-brand {
+            background: var(--title);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .btn-brand {
+            background: var(--title);
+            color: white;
+            transition: all 0.3s ease;
+        }
+
+        .btn-brand:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px -10px var(--accent-color);
+            filter: brightness(1.1);
+        }
+    </style>
+</head>
+<body class="text-slate-900 min-h-screen">
+    <div class="max-w-6xl mx-auto py-12 px-6">
+        
+        <header class="flex justify-between items-end mb-12">
+            <div>
+                <h1 class="text-5xl font-extrabold tracking-tight text-brand">
+                    Daily focus
+                </h1>
+                <p class="text-slate-500 mt-2 font-medium">Let's keep our promises today.</p>
+            </div>
+            <div class="glass px-6 py-3 rounded-2xl shadow-sm text-sm font-semibold text-slate-600">
+                {{ now }}
+            </div>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-10">
+            
+            <div class="lg:col-span-7 space-y-8">
+                
+                <div class="glass p-3 rounded-[2.5rem] shadow-xl shadow-indigo-100/20">
+                    <form action="/start" method="post" class="flex gap-3">
+                        <input type="text" name="task_name" required 
+                            placeholder="What is your goal?" 
+                            class="flex-1 bg-transparent border-none rounded-3xl px-6 py-4 text-lg focus:ring-0 outline-none">
+                        <button type="submit" class="btn-brand px-10 py-4 rounded-[1.8rem] font-bold shadow-lg">
+                            Start
+                        </button>
+                    </form>
+                </div>
+
+                {% if active %}
+                <div class="space-y-4">
+                    <h3 class="text-xs font-bold uppercase tracking-[0.2em] text-slate-400 ml-6">In progress</h3>
+                    {% for name, start_timestamp in active.items() %}
+                    <div class="glass p-8 rounded-[2rem] shadow-md flex justify-between items-center transition-all">
+                        <div class="flex items-center gap-6">
+                            <div class="relative">
+                                <div class="h-4 w-4 bg-green-500 rounded-full animate-ping absolute italic"></div>
+                                <div class="h-4 w-4 bg-green-500 rounded-full relative"></div>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-2xl tracking-tight">{{ name }}</h4>
+                                <span class="text-indigo-600 font-mono text-xl timer" data-start="{{ start_timestamp }}">00:00:00</span>
+                            </div>
+                        </div>
+                        <form action="/stop" method="post">
+                            <input type="hidden" name="task_name" value="{{ name }}">
+                            <button type="submit" class="bg-slate-900 hover:bg-black text-white px-8 py-4 rounded-2xl font-bold transition-all shadow-lg">
+                                Done
+                            </button>
+                        </form>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="lg:col-span-5 space-y-8">
+                
+                <div class="glass p-10 rounded-[2.5rem] shadow-xl">
+                    <h2 class="text-xl font-bold mb-8 flex items-center gap-2">
+                        Daily productivity
+                    </h2>
+                    <div class="space-y-8">
+                        {% for date, total in stats.items() %}
+                        <div>
+                            <div class="flex justify-between text-sm mb-3">
+                                <span class="font-bold text-slate-400 uppercase tracking-wider text-[10px]">{{ date }}</span>
+                                <span class="font-extrabold">{{ "%.2f"|format(total) }}h</span>
+                            </div>
+                            <div class="w-full bg-slate-200/50 h-3 rounded-full overflow-hidden">
+                                <div class="btn-brand h-full transition-all duration-1000" 
+                                     style="width: {{ [ (total/8)*100, 100 ] | min }}%"></div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="glass p-10 rounded-[2.5rem] shadow-xl">
+                    <h2 class="text-xl font-bold mb-8">Previous sessions</h2>
+                    <div class="space-y-6">
+                        {% for log in logs[:6] %}
+                        <div class="flex justify-between items-center group">
+                            <div>
+                                <p class="font-bold text-slate-800">{{ log.name }}</p>
+                                <p class="text-xs font-medium text-slate-400">{{ log.date_str }}</p>
+                            </div>
+                            <div class="flex items-center gap-4">
+                                <span class="text-sm font-black text-slate-500">{{ (log.seconds / 60)|int }}m</span>
+                                <form action="/delete/{{ log.id }}" method="post" onsubmit="return confirm('Delete this?')">
+                                    <button class="opacity-0 group-hover:opacity-100 p-2 hover:bg-red-50 rounded-full text-red-400 transition-all">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                        </svg>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function updateTimers() {
+            const now = Math.floor(Date.now() / 1000);
+            document.querySelectorAll('.timer').forEach(timer => {
+                const start = parseInt(timer.getAttribute('data-start'));
+                const diff = now - start;
+                const hrs = Math.floor(diff / 3600).toString().padStart(2, '0');
+                const mins = Math.floor((diff % 3600) / 60).toString().padStart(2, '0');
+                const secs = (diff % 60).toString().padStart(2, '0');
+                timer.innerText = `${hrs}:${mins}:${secs}`;
+            });
+        }
+        setInterval(updateTimers, 1000);
+        updateTimers();
+    </script>
+</body>
+</html>
