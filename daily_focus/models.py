@@ -7,3 +7,7 @@ class TaskLog(SQLModel, table=True):
     seconds: int
     created_at: datetime = Field(default_factory=datetime.now)
     date_str: str = Field(default_factory=lambda: datetime.now().strftime("%Y-%m-%d"))
+
+class ActiveTimer(SQLModel, table=True):
+    task_name: str = Field(primary_key=True)
+    start_time: float
