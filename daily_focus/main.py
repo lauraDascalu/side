@@ -8,6 +8,8 @@ from datetime import datetime
 
 app = FastAPI()
 templates = Jinja2Templates(directory="templates")
-init_db()
+@app.on_event("startup")
+def on_startup():
+    init_db()
 app.include_router(router)
 
