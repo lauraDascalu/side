@@ -49,13 +49,14 @@ async def start_timer(task_name: str = Form(..., min_length=1)):
 @router.post("/stop")
 async def stop_timer(task_name: str = Form(...)):
     with Session(engine) as session:
-        timer = session.get(ActiveTimer, task_name)
+        statement = select(ActiveTimer).where(ActiveTimer.task_name == task_name)
+        timer = session.exec(statement).first()
+        
         if timer:
             duration = int(time.time() - timer.start_time)
             session.add(TaskLog(name=task_name, seconds=duration))
-            session.delete(timer)
+            session.delete(timer) 
             session.commit()
-            
     return RedirectResponse(url="/", status_code=303)
 
 @router.post("/delete/{task_id}")
