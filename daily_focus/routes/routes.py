@@ -18,7 +18,7 @@ async def home(request: Request):
         active_db = session.exec(select(ActiveTimer)).all()
         active_timers_dict = {t.task_name: t.start_time for t in active_db}
         todos = session.exec(select(TodoItem)).all()
-
+ 
     stats = {}
     logs_by_day = {}
     for log in logs:
@@ -27,41 +27,45 @@ async def home(request: Request):
             logs_by_day[log.date_str] = []
         logs_by_day[log.date_str].append(log)
 
-    return templates.TemplateResponse("index.html", {
-        "request": request,
-        "logs_by_day": logs_by_day,
-        "stats": stats,
-        "active": active_timers_dict,
-        "todos": todos,
-        "now": datetime.now().strftime("%B %d, %Y")
-    })
+    return templates.TemplateResponse(
+        request=request, 
+        name="index.html", 
+        context={
+            "logs_by_day": logs_by_day,
+            "stats": stats, 
+            "active": active_timers_dict, 
+            "todos": todos,
+            "now": datetime.now().strftime("%B %d, %Y")
+        }
+    )
 
 @router.post("/start")
 async def start_timer(task_name: str = Form(..., min_length=1)):
     task_name = task_name.strip()
     if not task_name:
         return RedirectResponse(url="/", status_code=303)
-        
+ 
     with Session(engine) as session:
         new_timer = ActiveTimer(task_name=task_name, start_time=time.time())
-        session.merge(new_timer) 
+        session.merge(new_timer)
         session.commit()
-        
+ 
     return RedirectResponse(url="/", status_code=303)
-
+ 
 @router.post("/stop")
 async def stop_timer(task_name: str = Form(...)):
     with Session(engine) as session:
         statement = select(ActiveTimer).where(ActiveTimer.task_name == task_name)
         timer = session.exec(statement).first()
-        
+ 
         if timer:
             duration = int(time.time() - timer.start_time)
             session.add(TaskLog(name=task_name, seconds=duration))
-            session.delete(timer) 
+            session.delete(timer)
             session.commit()
+ 
     return RedirectResponse(url="/", status_code=303)
-
+ 
 @router.post("/delete/{task_id}")
 async def delete_task(task_id: int):
     with Session(engine) as session:
@@ -70,19 +74,32 @@ async def delete_task(task_id: int):
             session.delete(task)
             session.commit()
     return RedirectResponse(url="/", status_code=303)
-
+ 
 @router.post("/todo/add")
 async def add_todo(content: str = Form(...)):
+    content = content.strip()
+    if not content:
+        return RedirectResponse(url="/", status_code=303)
     with Session(engine) as session:
         session.add(TodoItem(content=content))
         session.commit()
     return RedirectResponse(url="/", status_code=303)
-
+ 
 @router.post("/todo/toggle/{todo_id}")
 async def toggle_todo(todo_id: int):
     with Session(engine) as session:
         todo = session.get(TodoItem, todo_id)
         if todo:
             todo.is_completed = not todo.is_completed
+            session.add(todo)
+            session.commit()
+    return RedirectResponse(url="/", status_code=303)
+ 
+@router.post("/todo/delete/{todo_id}")
+async def delete_todo(todo_id: int):
+    with Session(engine) as session:
+        todo = session.get(TodoItem, todo_id)
+        if todo:
+            session.delete(todo)
             session.commit()
     return RedirectResponse(url="/", status_code=303)

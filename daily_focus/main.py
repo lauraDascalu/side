@@ -1,15 +1,12 @@
-from fastapi import FastAPI, Request
+from fastapi import FastAPI
 from fastapi.templating import Jinja2Templates
-from database import init_db, get_session
-from routes.routes import router
-from sqlmodel import Session, select
-from models import TaskLog
-from datetime import datetime
-
+from database import init_db
+from routes.routes import router  
 app = FastAPI()
 templates = Jinja2Templates(directory="templates")
+
 @app.on_event("startup")
 def on_startup():
     init_db()
-app.include_router(router)
 
+app.include_router(router)

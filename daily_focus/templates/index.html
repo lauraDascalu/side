@@ -19,7 +19,7 @@
         body { 
             font-family: 'Plus Jakarta Sans', sans-serif; 
             background: var(--bg-gradient);
-            min-height: screen;
+            min-height: 100vh;
         }
 
         .glass { 
@@ -65,8 +65,10 @@
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-10">
             
+            <!-- LEFT COLUMN -->
             <div class="lg:col-span-7 space-y-8">
                 
+                <!-- Start timer -->
                 <div class="glass p-3 rounded-[2.5rem] shadow-xl shadow-indigo-100/20">
                     <form action="/start" method="post" class="flex gap-3">
                         <input type="text" name="task_name" required 
@@ -78,6 +80,7 @@
                     </form>
                 </div>
 
+                <!-- Active timers -->
                 {% if active %}
                 <div class="space-y-4">
                     <h3 class="text-xs font-bold uppercase tracking-[0.2em] text-slate-400 ml-6">In progress</h3>
@@ -85,7 +88,7 @@
                     <div class="glass p-8 rounded-[2rem] shadow-md flex justify-between items-center transition-all">
                         <div class="flex items-center gap-6">
                             <div class="relative">
-                                <div class="h-4 w-4 bg-green-500 rounded-full animate-ping absolute italic"></div>
+                                <div class="h-4 w-4 bg-green-500 rounded-full animate-ping absolute"></div>
                                 <div class="h-4 w-4 bg-green-500 rounded-full relative"></div>
                             </div>
                             <div>
@@ -103,18 +106,72 @@
                     {% endfor %}
                 </div>
                 {% endif %}
+
+                <!-- Todo list -->
+                <div class="glass p-8 rounded-[2rem] shadow-xl mt-8 border border-white/20">
+                    <div class="flex items-center justify-between mb-6">
+                        <h2 class="text-xl font-bold mb-8">To do list</h2>
+                        <span class="bg-indigo-100 text-indigo-600 px-3 py-1 rounded-full text-xs font-bold">
+                            {{ todos|length }} TASKS
+                        </span>
+                    </div>
+
+                    <form action="/todo/add" method="post" class="mb-8 flex gap-3">
+                        <input type="text" name="content" required placeholder="Set your goals" 
+                            class="flex-1 bg-white/40 border border-white/20 rounded-2xl px-5 py-3 outline-none focus:ring-2 focus:ring-indigo-400 transition-all placeholder:text-slate-500">
+                        <button type="submit" class="bg-[#6572c3] text-white w-12 h-12 rounded-2xl font-bold hover:scale-105 transition-transform flex items-center justify-center shadow-lg">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                            </svg>
+                        </button>
+                    </form>
+
+                <div class="space-y-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
+                    {% for todo in todos %}
+                    <div class="group flex items-center justify-between bg-white/40 p-4 rounded-2xl border border-white/10 hover:bg-white/60 transition-all">
+                        <div class="flex items-center gap-4">
+                            <form action="/todo/toggle/{{ todo.id }}" method="post">
+                                <button type="submit" class="w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all
+                                    {% if todo.is_completed %} bg-green-500 border-green-500 {% else %} border-indigo-300 hover:border-indigo-500 {% endif %}">
+                                    {% if todo.is_completed %}
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                                    </svg>
+                                    {% endif %}
+                                </button>
+                            </form>
+                            <span class="font-medium text-slate-700 {% if todo.is_completed %} line-through text-slate-400 {% endif %}">
+                                {{ todo.content }}
+                            </span>
+                        </div>
+                        
+                        <form action="/todo/delete/{{ todo.id }}" method="post" class="opacity-0 group-hover:opacity-100 transition-opacity">
+                            <button type="submit" class="text-red-400 hover:text-red-600">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                </svg>
+                            </button>
+                        </form>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-6">
+                        <p class="text-slate-400 text-sm italic">No tasks set.</p>
+                    </div>
+                    {% endfor %}
+                </div>
             </div>
 
+            <!-- RIGHT COLUMN -->
             <div class="lg:col-span-5 space-y-8">
                 
+                <!-- Daily productivity -->
                 <div class="glass p-10 rounded-[2.5rem] shadow-xl">
-                    <h2 class="text-xl font-bold mb-8 flex items-center gap-2">
-                        Daily productivity
-                    </h2>
-                    <div class="space-y-8">
+                    <h2 class="text-xl font-bold mb-8">Daily productivity</h2>
+                    {% if stats %}
+                    <div class="space-y-6">
                         {% for date, total in stats.items() %}
                         <div>
-                            <div class="flex justify-between text-sm mb-3">
+                            <div class="flex justify-between text-sm mb-2">
                                 <span class="font-bold text-slate-400 uppercase tracking-wider text-[10px]">{{ date }}</span>
                                 <span class="font-extrabold">{{ "%.2f"|format(total) }}h</span>
                             </div>
@@ -125,56 +182,50 @@
                         </div>
                         {% endfor %}
                     </div>
+                    {% else %}
+                    <p class="text-slate-400 text-sm text-center py-4">No sessions logged yet.</p>
+                    {% endif %}
                 </div>
 
+                <!-- Previous sessions -->
                 <div class="glass p-10 rounded-[2.5rem] shadow-xl">
-                    <h2 class="text-xl font-bold mb-8">Previous sessions</h2>
-                    <div class="space-y-6">
+                    <h2 class="text-xl font-bold mb-6">Previous sessions</h2>
+                    {% if logs_by_day %}
+                    <div class="space-y-4">
                         {% for day, day_logs in logs_by_day.items() %}
-                            <h3 class="font-bold mt-4">{{ day }}</h3>
-                            {% for log in day_logs %}
-                            <div class="flex justify-between items-center group">
-                                <div>
-                                    <p class="font-bold text-slate-800">{{ log.name }}</p>
-                                    <p class="text-xs font-medium text-slate-400">{{ log.date_str }}</p>
+                        <div>
+                            <h3 class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-3">{{ day }}</h3>
+                            <div class="space-y-2">
+                                {% for log in day_logs %}
+                                <div class="flex justify-between items-center group py-2 border-b border-white/30 last:border-0">
+                                    <div>
+                                        <p class="font-bold text-slate-800">{{ log.name }}</p>
+                                    </div>
+                                    <div class="flex items-center gap-3">
+                                        <span class="text-sm font-black text-slate-500">
+                                            {% if log.seconds >= 3600 %}
+                                                {{ (log.seconds / 3600) | round(1) }}h
+                                            {% else %}
+                                                {{ (log.seconds / 60)|int }}m
+                                            {% endif %}
+                                        </span>
+                                        <form action="/delete/{{ log.id }}" method="post" onsubmit="return confirm('Delete this session?')">
+                                            <button class="opacity-0 group-hover:opacity-100 p-1.5 hover:bg-red-50 rounded-full text-red-400 transition-all">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                </svg>
+                                            </button>
+                                        </form>
+                                    </div>
                                 </div>
-                                <div class="flex items-center gap-4">
-                                    <span class="text-sm font-black text-slate-500">{{ (log.seconds / 60)|int }}m</span>
-                                    <form action="/delete/{{ log.id }}" method="post" onsubmit="return confirm('Delete this?')">
-                                        <button class="opacity-0 group-hover:opacity-100 p-2 hover:bg-red-50 rounded-full text-red-400 transition-all">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                            </svg>
-                                        </button>
-                                    </form>
-                                </div>
+                                {% endfor %}
                             </div>
-                            {% endfor %}
+                        </div>
                         {% endfor %}
                     </div>
-                </div>
-                <div class="glass p-10 rounded-[2.5rem] shadow-xl mt-8">
-                <h2 class="text-xl font-bold mb-6">To-Do List</h2>
-                <form action="/todo/add" method="post" class="mb-6 flex gap-2">
-                    <input type="text" name="content" placeholder="Add a quick task..." 
-                        class="flex-1 bg-white/50 rounded-xl px-4 py-2 outline-none focus:ring-2 focus:ring-indigo-300">
-                    <button type="submit" class="btn-brand px-4 py-2 rounded-xl font-bold">+</button>
-                </form>
-    
-                <div class="space-y-3">
-                    {% for todo in todos %}
-                    <div class="flex items-center justify-between bg-white/30 p-3 rounded-xl">
-                        <span class="{% if todo.is_completed %}line-through text-slate-400{% endif %}">
-                            {{ todo.content }}
-                        </span>
-                        <form action="/todo/toggle/{{ todo.id }}" method="post">
-                            <button type="submit" class="text-xs font-bold p-2 {% if todo.is_completed %}text-green-500{% else %}text-slate-400{% endif %}">
-                                {% if todo.is_completed %}✓ Done{% else %}○ Do it{% endif %}
-                            </button>
-                        </form>
-                    </div>
-                    {% endfor %}
-                </div>
+                    {% else %}
+                    <p class="text-slate-400 text-sm text-center py-4">No sessions yet. Start your first timer!</p>
+                    {% endif %}
                 </div>
             </div>
         </div>
