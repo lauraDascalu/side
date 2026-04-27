@@ -11,3 +11,8 @@ class TaskLog(SQLModel, table=True):
 class ActiveTimer(SQLModel, table=True):
     task_name: str = Field(primary_key=True)
     start_time: float
+
+class TodoItem(SQLModel, table=True):
+    id: int | None = Field(default=None, primary_key=True)
+    content: str
+    is_completed: bool = Field(default=False)

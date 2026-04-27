@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, Form, Request
 from fastapi.responses import RedirectResponse, HTMLResponse 
 from sqlmodel import Session, select
 from database import get_session, engine 
-from models import TaskLog, ActiveTimer  
+from models import TaskLog, ActiveTimer, TodoItem
 from datetime import datetime 
 import time
 
@@ -17,21 +17,24 @@ async def home(request: Request):
         logs = session.exec(select(TaskLog).order_by(TaskLog.created_at.desc())).all()
         active_db = session.exec(select(ActiveTimer)).all()
         active_timers_dict = {t.task_name: t.start_time for t in active_db}
-        
+        todos = session.exec(select(TodoItem)).all()
+
     stats = {}
+    logs_by_day = {}
     for log in logs:
         stats[log.date_str] = stats.get(log.date_str, 0) + (log.seconds / 3600)
+        if log.date_str not in logs_by_day:
+            logs_by_day[log.date_str] = []
+        logs_by_day[log.date_str].append(log)
 
-    return templates.TemplateResponse(
-        request=request, 
-        name="index.html", 
-        context={
-            "logs": logs, 
-            "stats": stats, 
-            "active": active_timers_dict, # Folosim ce am citit din DB
-            "now": datetime.now().strftime("%B %d, %Y")
-        }
-    )
+    return templates.TemplateResponse("index.html", {
+        "request": request,
+        "logs_by_day": logs_by_day,
+        "stats": stats,
+        "active": active_timers_dict,
+        "todos": todos,
+        "now": datetime.now().strftime("%B %d, %Y")
+    })
 
 @router.post("/start")
 async def start_timer(task_name: str = Form(..., min_length=1)):
@@ -41,7 +44,7 @@ async def start_timer(task_name: str = Form(..., min_length=1)):
         
     with Session(engine) as session:
         new_timer = ActiveTimer(task_name=task_name, start_time=time.time())
-        session.merge(new_timer) # merge face update dacă există deja sau insert dacă e nou
+        session.merge(new_timer) 
         session.commit()
         
     return RedirectResponse(url="/", status_code=303)
@@ -65,5 +68,21 @@ async def delete_task(task_id: int):
         task = session.get(TaskLog, task_id)
         if task:
             session.delete(task)
+            session.commit()
+    return RedirectResponse(url="/", status_code=303)
+
+@router.post("/todo/add")
+async def add_todo(content: str = Form(...)):
+    with Session(engine) as session:
+        session.add(TodoItem(content=content))
+        session.commit()
+    return RedirectResponse(url="/", status_code=303)
+
+@router.post("/todo/toggle/{todo_id}")
+async def toggle_todo(todo_id: int):
+    with Session(engine) as session:
+        todo = session.get(TodoItem, todo_id)
+        if todo:
+            todo.is_completed = not todo.is_completed
             session.commit()
     return RedirectResponse(url="/", status_code=303)

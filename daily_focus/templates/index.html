@@ -130,25 +130,51 @@
                 <div class="glass p-10 rounded-[2.5rem] shadow-xl">
                     <h2 class="text-xl font-bold mb-8">Previous sessions</h2>
                     <div class="space-y-6">
-                        {% for log in logs[:6] %}
-                        <div class="flex justify-between items-center group">
-                            <div>
-                                <p class="font-bold text-slate-800">{{ log.name }}</p>
-                                <p class="text-xs font-medium text-slate-400">{{ log.date_str }}</p>
+                        {% for day, day_logs in logs_by_day.items() %}
+                            <h3 class="font-bold mt-4">{{ day }}</h3>
+                            {% for log in day_logs %}
+                            <div class="flex justify-between items-center group">
+                                <div>
+                                    <p class="font-bold text-slate-800">{{ log.name }}</p>
+                                    <p class="text-xs font-medium text-slate-400">{{ log.date_str }}</p>
+                                </div>
+                                <div class="flex items-center gap-4">
+                                    <span class="text-sm font-black text-slate-500">{{ (log.seconds / 60)|int }}m</span>
+                                    <form action="/delete/{{ log.id }}" method="post" onsubmit="return confirm('Delete this?')">
+                                        <button class="opacity-0 group-hover:opacity-100 p-2 hover:bg-red-50 rounded-full text-red-400 transition-all">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                            </svg>
+                                        </button>
+                                    </form>
+                                </div>
                             </div>
-                            <div class="flex items-center gap-4">
-                                <span class="text-sm font-black text-slate-500">{{ (log.seconds / 60)|int }}m</span>
-                                <form action="/delete/{{ log.id }}" method="post" onsubmit="return confirm('Delete this?')">
-                                    <button class="opacity-0 group-hover:opacity-100 p-2 hover:bg-red-50 rounded-full text-red-400 transition-all">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                        </svg>
-                                    </button>
-                                </form>
-                            </div>
-                        </div>
+                            {% endfor %}
                         {% endfor %}
                     </div>
+                </div>
+                <div class="glass p-10 rounded-[2.5rem] shadow-xl mt-8">
+                <h2 class="text-xl font-bold mb-6">To-Do List</h2>
+                <form action="/todo/add" method="post" class="mb-6 flex gap-2">
+                    <input type="text" name="content" placeholder="Add a quick task..." 
+                        class="flex-1 bg-white/50 rounded-xl px-4 py-2 outline-none focus:ring-2 focus:ring-indigo-300">
+                    <button type="submit" class="btn-brand px-4 py-2 rounded-xl font-bold">+</button>
+                </form>
+    
+                <div class="space-y-3">
+                    {% for todo in todos %}
+                    <div class="flex items-center justify-between bg-white/30 p-3 rounded-xl">
+                        <span class="{% if todo.is_completed %}line-through text-slate-400{% endif %}">
+                            {{ todo.content }}
+                        </span>
+                        <form action="/todo/toggle/{{ todo.id }}" method="post">
+                            <button type="submit" class="text-xs font-bold p-2 {% if todo.is_completed %}text-green-500{% else %}text-slate-400{% endif %}">
+                                {% if todo.is_completed %}✓ Done{% else %}○ Do it{% endif %}
+                            </button>
+                        </form>
+                    </div>
+                    {% endfor %}
+                </div>
                 </div>
             </div>
         </div>
